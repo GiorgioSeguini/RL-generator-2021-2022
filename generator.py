@@ -119,7 +119,7 @@ def generate_ram(num, solver):
 def main(size, limit):
     solver = Solver()
     with open('ram_content.txt', 'w') as ram, open('test_values.txt', 'w') as readable:
-        for i in range(size): #tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
+        for i in tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
             num = randint(1, limit)
             test = generate_ram(num, solver)
 
