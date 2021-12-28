@@ -82,8 +82,10 @@ class Solver:
         #res = self.byteSolver(fsm, input_val)
         #self.state = fsm.state
         #return res
+        
 
-def solve_batch(batch):
+
+def solve_batch(batch, solver):
     """
     Given a list with a structure like
     [num, BYTE_1, ..., BYTE_(num)]
@@ -91,8 +93,7 @@ def solve_batch(batch):
     """
 
     stream = batch[1:]
-    solver = Solver()
-
+    solver.state = 0
     def equalize(byte):
         temp_val = solver.getNextValue(byte)
         return [floor(temp_val/256), temp_val%256]
@@ -102,30 +103,31 @@ def solve_batch(batch):
         res += equalize(x)
     return res
 
-def generate_ram(num):
+def generate_ram(num, solver):
     """
     Generates ram values for a random test case
     """
 
     batch = generate_batch(num)
-    solution = solve_batch(batch)
-    return [num] + batch + solution
+    solution = solve_batch(batch, solver)
+    return batch + solution
 
 
 @click.command()
 @click.option('--size', default=100, show_default=True, help='Number of tests to generate')
-@click.option('--limit', default=128, show_default=True, help='Maximum row/col size')
+@click.option('--limit', default=128, show_default=True, help='Maximum input stream size')
 def main(size, limit):
+    solver = Solver()
     with open('ram_content.txt', 'w') as ram, open('test_values.txt', 'w') as readable:
         for i in range(size): #tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
             num = randint(1, limit)
-            test = generate_ram(num)
+            test = generate_ram(num, solver)
 
             for value in test:
                 ram.write(f'{value}\n')
 
             written_ram = ' '.join([str(v) for v in test])
-            readable.write(f'{i}) {test[1]} cols, {test[2]} rows: {test[0]} pixels \t\t RAM: {written_ram}\n')
+            readable.write(f'{test[0]} bytes \t\t RAM: {written_ram}\n')
 
 
 if __name__ == '__main__':

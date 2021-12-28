@@ -1,4 +1,4 @@
--- Change paths at lines 65, 100, 101 -
+-- Change paths at lines 65, 141, 144 -
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
@@ -72,15 +72,16 @@ begin
       if s_read then
         readline(read_file, read_line);
         read(read_line, num);
-        for i in 0 to (num+1) loop
+        RAM(0) <= std_logic_vector(to_unsigned(num, 8));
+        for i in 1 to (num) loop
           readline(read_file, read_line);
           read(read_line, handler);
           RAM(i) <= std_logic_vector(to_unsigned(handler, 8));
         end loop;
-        for i in 0 to (2 * num) loop
+        for i in 0 to (2 * num - 1) loop
           readline(read_file, read_line);
           read(read_line, handler);
-          RAM(2000 + i) <= std_logic_vector(to_unsigned(handler, 8));
+          RAM(3000 + i) <= std_logic_vector(to_unsigned(handler, 8));
         end loop;
         if endfile(read_file) then
           s_read_done <= true;
@@ -129,8 +130,8 @@ begin
       wait until tb_done = '0';
       wait for c_CLOCK_PERIOD;
 
-      for i in 0 to 2 * num loop
-        if (RAM(1000 + i) /= RAM(2000 + i)) then
+      for i in 0 to (2 * num -1) loop
+        if (RAM(1000 + i) /= RAM(3000 + i)) then
           passed := false;
           exit;
         end if;

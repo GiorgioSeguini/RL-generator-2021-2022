@@ -1,6 +1,5 @@
-generator/
-.vscode/
-pyvenv.cfg
 ram_content.txt
 test_values.txt
-venv
+ram.vhd
+passati.txt
+non_passati.txt
