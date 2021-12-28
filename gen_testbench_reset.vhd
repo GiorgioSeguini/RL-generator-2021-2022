@@ -26,7 +26,7 @@ architecture projecttb of project_tb is
   signal RAM              : ram_type;
   signal s_read_done      : boolean := false;
   signal s_read           : boolean := false;
-  shared variable pix_num : integer;
+  shared variable num : integer;
 
   component project_reti_logiche is
     port (
@@ -71,16 +71,16 @@ begin
     if tb_clk'event and tb_clk = '1' then
       if s_read then
         readline(read_file, read_line);
-        read(read_line, pix_num);
-        for i in 0 to (pix_num + 1) loop
+        read(read_line, num);
+        for i in 0 to (num + 1) loop
           readline(read_file, read_line);
           read(read_line, handler);
           RAM(i) <= std_logic_vector(to_unsigned(handler, 8));
         end loop;
-        for i in pix_num + 2 to (2 * pix_num + 1) loop
+        for i in 0 to (2 * num) loop
           readline(read_file, read_line);
           read(read_line, handler);
-          RAM(i + pix_num) <= std_logic_vector(to_unsigned(handler, 8));
+          RAM(2000 + i) <= std_logic_vector(to_unsigned(handler, 8));
         end loop;
         if endfile(read_file) then
           s_read_done <= true;
@@ -129,8 +129,8 @@ begin
       wait until tb_done = '0';
       wait for c_CLOCK_PERIOD;
 
-      for i in 2 + pix_num to 2 * pix_num + 1 loop
-        if (RAM(i) /= RAM(i + pix_num)) then
+      for i in 0 to 2 * num loop
+        if (RAM(1000 + i) /= RAM(2000 + i)) then
           passed := false;
           exit;
         end if;
