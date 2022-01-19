@@ -1,5 +1,5 @@
 from math import floor
-from random import randint, gauss
+from random import randint
 from tqdm import tqdm
 import click
 
@@ -10,10 +10,7 @@ def generate_batch(num):
     The first element is the sequence lenght as specified in the document
     """
 
-    def clamp(value):
-        return max(min(floor(value), 255), 0)
-
-    return [num] + [clamp(gauss(127, 30)) for _ in range(num)]
+    return [num] + [randint(0, 255) for _ in range(num)]
 
 
 class FSM:
