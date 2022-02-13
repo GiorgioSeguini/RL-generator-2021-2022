@@ -1,5 +1,4 @@
-ram_content.txt
-test_values.txt
-ram.vhd
-passati.txt
-non_passati.txt
+/ram_content.txt
+/test_values.txt
+/passati.txt
+/non_passati.txt

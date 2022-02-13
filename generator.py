@@ -1,6 +1,5 @@
 from math import floor
-from random import randint
-from tqdm import tqdm
+from random import randint, seed
 import click
 
 
@@ -17,39 +16,40 @@ class FSM:
     def __init__(self, state):
         self.state = state
 
-    #return output value and update current state
+    # return output value and update current state
     def getVal(self, input):
-        if self.state==0:
-            if input==0:
+        if self.state == 0:
+            if input == 0:
                 self.state = 0
                 return 0
             else:
                 self.state = 2
                 return 3
-        if self.state==1:
-            if input==0:
+        if self.state == 1:
+            if input == 0:
                 self.state = 0
                 return 3
             else:
                 self.state = 2
                 return 0
-        if self.state==2:
-            if input==0:
+        if self.state == 2:
+            if input == 0:
                 self.state = 1
                 return 1
             else:
                 self.state = 3
                 return 2
-        if self.state==3:
-            if input==0:
+        if self.state == 3:
+            if input == 0:
                 self.state = 1
                 return 2
             else:
                 self.state = 3
                 return 1
 
+
 class Solver:
-    #store the current state
+    # store the current state
     # to be more efficient calculate all possible output sequence in the constructor
     def __init__(self):
         self.results = []
@@ -57,8 +57,9 @@ class Solver:
         for state in range(4):
             self.results.append([])
             for val in range(256):
-                fsm= FSM(state)
-                self.results[state].append([self.byteSolver(fsm, val), fsm.state])
+                fsm = FSM(state)
+                self.results[state].append(
+                    [self.byteSolver(fsm, val), fsm.state])
 
     @staticmethod
     def byteSolver(fsm, byte):
@@ -70,16 +71,11 @@ class Solver:
             res += fsm.getVal(bit)
         return res
 
-    #return an integer that represent the generated two bytes
+    # return an integer that represent the generated two bytes
     def getNextValue(self, input_val):
-        current_state= self.state
+        current_state = self.state
         self.state = self.results[current_state][input_val][1]
         return self.results[current_state][input_val][0]
-        #fsm = FSM(current_state)
-        #res = self.byteSolver(fsm, input_val)
-        #self.state = fsm.state
-        #return res
-        
 
 
 def solve_batch(batch, solver):
@@ -91,14 +87,16 @@ def solve_batch(batch, solver):
 
     stream = batch[1:]
     solver.state = 0
+
     def equalize(byte):
         temp_val = solver.getNextValue(byte)
-        return [floor(temp_val/256), temp_val%256]
+        return [floor(temp_val/256), temp_val % 256]
 
     res = []
     for x in stream:
         res += equalize(x)
     return res
+
 
 def generate_ram(num, solver):
     """
@@ -111,20 +109,26 @@ def generate_ram(num, solver):
 
 
 @click.command()
-@click.option('--size', default=100, show_default=True, help='Number of tests to generate')
-@click.option('--limit', default=128, show_default=True, help='Maximum input stream size')
-def main(size, limit):
+@click.option('--size', type=click.IntRange(0), default=100, show_default=True, help='Number of tests to generate')
+@click.option('--limit', type=click.IntRange(0, 255), default=255, show_default=True, help='Maximum input stream size')
+@click.option('--randseed', type=int, help='Random generator seed')
+def main(size, limit, randseed):
     solver = Solver()
+
+    if randseed:
+        seed(randseed)
+
     with open('ram_content.txt', 'w') as ram, open('test_values.txt', 'w') as readable:
-        for i in tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
-            num = randint(1, limit)
-            test = generate_ram(num, solver)
+        with click.progressbar(range(size), label='Generating tests', length=size) as bar:
+            for i in bar:
+                num = randint(0, limit)
+                test = generate_ram(num, solver)
 
-            for value in test:
-                ram.write(f'{value}\n')
+                for value in test:
+                    ram.write(f'{value}\n')
 
-            written_ram = ' '.join([str(v) for v in test])
-            readable.write(f'{test[0]} bytes \t\t RAM: {written_ram}\n')
+                written_ram = ' '.join([str(v) for v in test])
+                readable.write(f'{test[0]} bytes \t\t RAM: {written_ram}\n')
 
 
 if __name__ == '__main__':
