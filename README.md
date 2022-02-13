@@ -20,9 +20,10 @@ pip install -r requirements.txt
 Usage: generator.py [OPTIONS]
 
 Options:
-  --size INTEGER   Number of tests to generate  [default: 100]
-  --limit INTEGER  Maximum input stream size  [default: 255]
-  --help           Show this message and exit.
+  --size INTEGER RANGE   Number of tests to generate  [default: 100; x>=0]
+  --limit INTEGER RANGE  Maximum input stream size  [default: 255; 0<=x<=255]
+  --randseed INTEGER     Random generator seed
+  --help                 Show this message and exit.
 ```
 
 To generate tests run:
