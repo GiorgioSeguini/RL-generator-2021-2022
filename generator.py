@@ -112,12 +112,17 @@ def generate_ram(num, solver):
 
 @click.command()
 @click.option('--size', default=100, show_default=True, help='Number of tests to generate')
-@click.option('--limit', default=128, show_default=True, help='Maximum input stream size')
+@click.option('--limit', default=255, show_default=True, help='Maximum input stream size')
 def main(size, limit):
     solver = Solver()
+
+    if limit > 255 or limit < 0:
+        print('Invalid limit. Must be between 0 and 255. Quitting.')
+        return
+
     with open('ram_content.txt', 'w') as ram, open('test_values.txt', 'w') as readable:
         for i in tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
-            num = randint(1, limit)
+            num = randint(0, limit)
             test = generate_ram(num, solver)
 
             for value in test:
