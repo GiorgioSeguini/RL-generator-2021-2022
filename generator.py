@@ -1,6 +1,5 @@
 from math import floor
 from random import randint, seed
-from tqdm import tqdm
 import click
 
 
@@ -120,15 +119,16 @@ def main(size, limit, randseed):
         seed(randseed)
 
     with open('ram_content.txt', 'w') as ram, open('test_values.txt', 'w') as readable:
-        for i in tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
-            num = randint(0, limit)
-            test = generate_ram(num, solver)
+        with click.progressbar(range(size), label='Generating tests', length=size) as bar:
+            for i in bar:
+                num = randint(0, limit)
+                test = generate_ram(num, solver)
 
-            for value in test:
-                ram.write(f'{value}\n')
+                for value in test:
+                    ram.write(f'{value}\n')
 
-            written_ram = ' '.join([str(v) for v in test])
-            readable.write(f'{test[0]} bytes \t\t RAM: {written_ram}\n')
+                written_ram = ' '.join([str(v) for v in test])
+                readable.write(f'{test[0]} bytes \t\t RAM: {written_ram}\n')
 
 
 if __name__ == '__main__':
