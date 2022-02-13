@@ -1,5 +1,5 @@
 from math import floor
-from random import randint
+from random import randint, seed
 from tqdm import tqdm
 import click
 
@@ -110,14 +110,14 @@ def generate_ram(num, solver):
 
 
 @click.command()
-@click.option('--size', default=100, show_default=True, help='Number of tests to generate')
-@click.option('--limit', default=255, show_default=True, help='Maximum input stream size')
-def main(size, limit):
+@click.option('--size', type=click.IntRange(0), default=100, show_default=True, help='Number of tests to generate')
+@click.option('--limit', type=click.IntRange(0, 255), default=255, show_default=True, help='Maximum input stream size')
+@click.option('--randseed', type=int, help='Random generator seed')
+def main(size, limit, randseed):
     solver = Solver()
 
-    if limit > 255 or limit < 0:
-        print('Invalid limit. Must be between 0 and 255. Quitting.')
-        return
+    if randseed:
+        seed(randseed)
 
     with open('ram_content.txt', 'w') as ram, open('test_values.txt', 'w') as readable:
         for i in tqdm(range(size), desc='Generating tests', dynamic_ncols=True):
