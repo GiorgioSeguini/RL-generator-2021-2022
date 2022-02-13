@@ -17,39 +17,40 @@ class FSM:
     def __init__(self, state):
         self.state = state
 
-    #return output value and update current state
+    # return output value and update current state
     def getVal(self, input):
-        if self.state==0:
-            if input==0:
+        if self.state == 0:
+            if input == 0:
                 self.state = 0
                 return 0
             else:
                 self.state = 2
                 return 3
-        if self.state==1:
-            if input==0:
+        if self.state == 1:
+            if input == 0:
                 self.state = 0
                 return 3
             else:
                 self.state = 2
                 return 0
-        if self.state==2:
-            if input==0:
+        if self.state == 2:
+            if input == 0:
                 self.state = 1
                 return 1
             else:
                 self.state = 3
                 return 2
-        if self.state==3:
-            if input==0:
+        if self.state == 3:
+            if input == 0:
                 self.state = 1
                 return 2
             else:
                 self.state = 3
                 return 1
 
+
 class Solver:
-    #store the current state
+    # store the current state
     # to be more efficient calculate all possible output sequence in the constructor
     def __init__(self):
         self.results = []
@@ -57,8 +58,9 @@ class Solver:
         for state in range(4):
             self.results.append([])
             for val in range(256):
-                fsm= FSM(state)
-                self.results[state].append([self.byteSolver(fsm, val), fsm.state])
+                fsm = FSM(state)
+                self.results[state].append(
+                    [self.byteSolver(fsm, val), fsm.state])
 
     @staticmethod
     def byteSolver(fsm, byte):
@@ -70,16 +72,11 @@ class Solver:
             res += fsm.getVal(bit)
         return res
 
-    #return an integer that represent the generated two bytes
+    # return an integer that represent the generated two bytes
     def getNextValue(self, input_val):
-        current_state= self.state
+        current_state = self.state
         self.state = self.results[current_state][input_val][1]
         return self.results[current_state][input_val][0]
-        #fsm = FSM(current_state)
-        #res = self.byteSolver(fsm, input_val)
-        #self.state = fsm.state
-        #return res
-        
 
 
 def solve_batch(batch, solver):
@@ -91,14 +88,16 @@ def solve_batch(batch, solver):
 
     stream = batch[1:]
     solver.state = 0
+
     def equalize(byte):
         temp_val = solver.getNextValue(byte)
-        return [floor(temp_val/256), temp_val%256]
+        return [floor(temp_val/256), temp_val % 256]
 
     res = []
     for x in stream:
         res += equalize(x)
     return res
+
 
 def generate_ram(num, solver):
     """
